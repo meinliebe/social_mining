@@ -5,10 +5,12 @@ from django.db import models
 
 class Mining(models.Model):
 
+	facebook_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
 	name = models.CharField(max_length=500, null=True, blank=True)
 	category = models.CharField(max_length=500, null=True, blank=True)
-	likes = models.CharField(max_length=50, null=True, blank=True)
+	likes = models.IntegerField(null=True, blank=True)
 	location = models.CharField(max_length=200, null=True, blank=True) 
+	city = models.CharField(max_length=200, null=True, blank=True) 
 
 	class Meta:
 		verbose_name = "MINING"

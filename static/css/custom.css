@@ -1,0 +1,5 @@
+/* your styles go here */
+footer.main-footer {
+	position: absolute !important;
+	bottom: 0 !important;
+}
