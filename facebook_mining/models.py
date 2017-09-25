@@ -20,18 +20,18 @@ class Mining(models.Model):
 		return self.name
 		
 
-class Page_post(models.Model):
+class Page_feed(models.Model):
 
 	page_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
-	post_id = models.CharField(max_length=100,null=True,blank=True, unique=True)
-	name = models.CharField(max_length=100, null=True, blank=True)
+	feed_id = models.CharField(max_length=100,null=True,blank=True, unique=True)
+	created_time = models.DateField(null=True, blank=True)
 	message = models.CharField(max_length=9999, null=True, blank=True)
 
 	class Meta:
-		verbose_name = "Page_post"
-		verbose_name_plural = "Page_posts"
+		verbose_name = "PAGE FEED"
+		verbose_name_plural = "PAGE FEED"
 
 	def __str__(self):
-		return self.name
+		return self.feed_id
 	
 	

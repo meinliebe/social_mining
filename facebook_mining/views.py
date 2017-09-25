@@ -11,7 +11,7 @@ import json
 
 
 # ACCESS_TOKEN = 'EAACEdEose0cBANY2rmJLzvXpZAj3JkC3s18erkmFUFt8ZB4PnDxmA6ZAznEZCHklylkVOZCyMAZCA5FHMBEdt2sXFZCCyFPzvTvkBszvvCe9k6EplGzcDH8eJeMui9djHXbQP5vg0J9r5bRDEvRjZAyeUPTOQw727miJE6uR0Dl3OYP26KCxz05q5HN15ITMQBvnZAazPDrcDdwZDZD'
-ACCESS_TOKEN = 'EAACEdEose0cBAAxWcUEtna8qOZATk748B7WTHZAQqv9YHw2yqWqmZBcZC1MNl5jvy7K8gO9uI27gh51ky93YXZCKHMrFbls7zDWywqwmOtI5Fl70N396lPZBkkSyybKK9DYChfZCi1pkmwZA2ZBzsFldb0V0RGepxsd02yVWCzDZBZB7KRPQeTQIzJCLxqFCV4HNSypQVFXyOgOjwZDZD'
+ACCESS_TOKEN = 'EAACEdEose0cBAGnXZBD2NoCB8qendKbw8VAiq5tizchbFYE4C2vYqhwxIYH4MYKS5Fh7Ih9Wi2F3LQI3i05wbZADHLpqGBkGGsEL81VhNsIFsZAJLDzeefZBtdscHgJMBqWbfXsmeZBsJeLoLZCecFP1uOBj349MaBIdZB64smIr0hIFEZABeg46ZArykK6ZBZCvLuYv9yaZB5ybkAZDZD'
 
 def landing(request):
 	data = {}
@@ -44,7 +44,7 @@ def get_data(request):
 		raise GraphAPI(response)
 
 	types = 'page'
-	limits = '10'
+	limits = '20'
 	# keywords = 'pemerintah indonesia'
 	
 	kiri = 97.0137845
@@ -54,7 +54,7 @@ def get_data(request):
 	
 	results = []
 	page_id = []
-	posts = []
+	feeds = []
 	u = g.request("search", {'q' : keywords, 'type' : types, 'fields':'id,name,likes,location,category', 'limit':limits})
 
 	for p in u['data']:
@@ -81,15 +81,14 @@ def get_data(request):
 
 	# cari post per page
 	for x in page_id:	
-		post = g.get_connections(x['id'], connection_name='feed', fields='id')		
-		posts.append(post)
-
-	likes = []
-	for p in posts:
-		like = p['data']
-		likes.append(like)
-				
-	return HttpResponse(json.dumps(likes))
+		# created_time, message, id
+		feed = g.get_connections(x['id'], connection_name='feed', limit=1)
+		for f in feed['data']:
+			# feed_obj = {'feed_id': f['id'], 'page_id': x['id'], 'created_time': f['created_time'], 'message': f['message']}
+			# feed_obj = {'feed_id': f['id'], 'page_id': x['id'], 'created_time': f['created_time'], 'story': f['story']}
+			feeds.append(f['id'])
+		
+	return HttpResponse(json.dumps(feeds))
 # Create your views here.
 
 def hasil(request):
