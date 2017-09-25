@@ -19,4 +19,19 @@ class Mining(models.Model):
 	def __str__(self):
 		return self.name
 		
+
+class Page_post(models.Model):
+
+	page_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
+	post_id = models.CharField(max_length=100,null=True,blank=True, unique=True)
+	name = models.CharField(max_length=100, null=True, blank=True)
+	message = models.CharField(max_length=9999, null=True, blank=True)
+
+	class Meta:
+		verbose_name = "Page_post"
+		verbose_name_plural = "Page_posts"
+
+	def __str__(self):
+		return self.name
+	
 	

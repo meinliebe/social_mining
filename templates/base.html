@@ -30,7 +30,8 @@
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 	</head>
 	<body>
-		<div class="page home-page">
+		<div class="page ">
+		<div id="preloader" hidden="true"></div>
 			<!-- Main Navbar-->
 			{% include 'header_navbar.html' %}
 			<div class="page-content d-flex align-items-stretch">
@@ -67,6 +68,10 @@
 			e.src='//www.google-analytics.com/analytics.js';
 			r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
 			ga('create','UA-XXXXX-X');ga('send','pageview');
+
+			function loadjs(){
+				$('#preloader').hidden('false');
+			}
 		</script>
 		{% block js %}
 

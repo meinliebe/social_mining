@@ -1,5 +1,21 @@
 /* your styles go here */
 footer.main-footer {
-	position: absolute !important;
 	bottom: 0 !important;
+}
+
+section{
+	min-height: 625px !important;
+	display: block;
+	bottom: 0 !important;
+}
+
+div#preloader { 
+	position: fixed !important; 
+	left: 0 !important; 
+	top: 0 !important; 
+	z-index: 999 !important; 
+	width: 100% !important; 
+	height: 100% !important; 
+	overflow: visible !important; 
+	background: #333 url('http://files.mimoymima.com/images/loading.gif') no-repeat center center !important; 
 }
