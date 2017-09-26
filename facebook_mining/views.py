@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 
-from facebook_mining.models import Mining
+from facebook_mining.models import Mining, Page_feed, Likes
 import requests
+import dateutil.parser as dateparser
 
 import facebook
 import urllib.request
@@ -11,7 +12,7 @@ import json
 
 
 # ACCESS_TOKEN = 'EAACEdEose0cBANY2rmJLzvXpZAj3JkC3s18erkmFUFt8ZB4PnDxmA6ZAznEZCHklylkVOZCyMAZCA5FHMBEdt2sXFZCCyFPzvTvkBszvvCe9k6EplGzcDH8eJeMui9djHXbQP5vg0J9r5bRDEvRjZAyeUPTOQw727miJE6uR0Dl3OYP26KCxz05q5HN15ITMQBvnZAazPDrcDdwZDZD'
-ACCESS_TOKEN = 'EAACEdEose0cBAGnXZBD2NoCB8qendKbw8VAiq5tizchbFYE4C2vYqhwxIYH4MYKS5Fh7Ih9Wi2F3LQI3i05wbZADHLpqGBkGGsEL81VhNsIFsZAJLDzeefZBtdscHgJMBqWbfXsmeZBsJeLoLZCecFP1uOBj349MaBIdZB64smIr0hIFEZABeg46ZArykK6ZBZCvLuYv9yaZB5ybkAZDZD'
+ACCESS_TOKEN = 'EAACEdEose0cBAOltD8fo0gqcRH4eJ6hlc3RZBZCt3gQFiQ4sBdA6g9uSgaZAmxV8c03cveTH3ZBfqU77pwXVmpPKyRJDyobKi9QlBG6ZCDIw8Qx8S3OIDG8NlJinD1PTRO6OpIRy4T2mvotaro4zfBZBr1mSHriRnegaTr87ZC3ieABib1Lx70VL8293kPWCK2uQX7tN55PUwZDZD'
 
 def landing(request):
 	data = {}
@@ -44,7 +45,7 @@ def get_data(request):
 		raise GraphAPI(response)
 
 	types = 'page'
-	limits = '20'
+	limits = '5'
 	# keywords = 'pemerintah indonesia'
 	
 	kiri = 97.0137845
@@ -54,9 +55,12 @@ def get_data(request):
 	
 	results = []
 	page_id = []
-	feeds = []
-	u = g.request("search", {'q' : keywords, 'type' : types, 'fields':'id,name,likes,location,category', 'limit':limits})
+	feeds_id = []
+	likes = []
 
+	u = g.request("search", {'q' : keywords, 'type' : types, 'fields':'id,name,likes,location,category'})
+
+	# cari page berdasarkan keywords
 	for p in u['data']:
 		if 'location' in p:
 			if 'country' in p['location']:
@@ -73,22 +77,32 @@ def get_data(request):
 						p['location']['latitude'] < atas:
 						loc = str(p['location']['latitude'])+', '+str(p['location']['longitude'])
 						val = {'id': p['id'], 'name': p['name'], 'category': p['category'], 'likes': p['likes'], 'location': loc, 'city': None}
-	# for result in results:
-	# 	m = Mining.objects.update_or_create(facebook_id = result['id'], defaults = {'facebook_id' : result['id'], 'name' : result['name'], 'category' : result['category'], 'likes' : result['likes'], 'location' : result['location'], 'city' : result['city']})
-	# total_result = str(len(results))
-	# messages.add_message(request, messages.SUCCESS, 'Ditemukan '+total_result+' hasil dengan keywords '+keywords)
-	# return redirect('landing')
+	for result in results:
+		m = Mining.objects.update_or_create(facebook_id = result['id'], defaults = {'facebook_id' : result['id'], 'name' : result['name'], 'category' : result['category'], 'likes' : result['likes'], 'location' : result['location'], 'city' : result['city'], 'keyword': keywords})
 
-	# cari post per page
+	total_result = str(len(results))
+
+	# cari feed per page
 	for x in page_id:	
-		# created_time, message, id
-		feed = g.get_connections(x['id'], connection_name='feed', limit=1)
+		feed = g.get_connections(x['id'], connection_name='feed')
 		for f in feed['data']:
-			# feed_obj = {'feed_id': f['id'], 'page_id': x['id'], 'created_time': f['created_time'], 'message': f['message']}
-			# feed_obj = {'feed_id': f['id'], 'page_id': x['id'], 'created_time': f['created_time'], 'story': f['story']}
-			feeds.append(f['id'])
-		
-	return HttpResponse(json.dumps(feeds))
+			if 'message' in f:
+				f_id = {'feed_id':f['id'], 'page_id' : x['id']}
+				feeds_id.append(f_id)
+				d_parse = dateparser.parse(f['created_time'])
+				pf = Page_feed.objects.update_or_create(feed_id=f['id'], defaults = {'page_id': x['id'],'created_time': d_parse,'message': f['message']})
+
+	# cari likes per feed
+	for l in feeds_id:
+		like = g.get_connections(l['feed_id'], connection_name='likes')
+		for li in like['data']:
+			if 'name' in li:
+				Likes.objects.update_or_create(page_id=l['page_id'], feed_id=l['feed_id'], user_id = li['id'], defaults = {'user_name': li['name']})		
+
+	messages.add_message(request, messages.SUCCESS, 'Ditemukan '+total_result+' hasil dengan keywords '+keywords)
+	return redirect('landing')
+	# return HttpResponse(json.dumps(likes))
+
 # Create your views here.
 
 def hasil(request):

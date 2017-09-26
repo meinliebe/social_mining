@@ -9,6 +9,7 @@ class Mining(models.Model):
 	name = models.CharField(max_length=500, null=True, blank=True)
 	category = models.CharField(max_length=500, null=True, blank=True)
 	likes = models.IntegerField(null=True, blank=True)
+	keyword = models.CharField(max_length=200, null=True, blank=True)
 	location = models.CharField(max_length=200, null=True, blank=True) 
 	city = models.CharField(max_length=200, null=True, blank=True) 
 
@@ -22,10 +23,10 @@ class Mining(models.Model):
 
 class Page_feed(models.Model):
 
-	page_id = models.CharField(max_length=100, null=True, blank=True, unique=True)
 	feed_id = models.CharField(max_length=100,null=True,blank=True, unique=True)
+	page_id = models.CharField(max_length=100, null=True, blank=True)
 	created_time = models.DateField(null=True, blank=True)
-	message = models.CharField(max_length=9999, null=True, blank=True)
+	message = models.TextField(max_length=1000000, null=True, blank=True)
 
 	class Meta:
 		verbose_name = "PAGE FEED"
@@ -34,4 +35,18 @@ class Page_feed(models.Model):
 	def __str__(self):
 		return self.feed_id
 	
+	
+class Likes(models.Model):
+
+	feed_id = models.CharField(max_length=255, null=True, blank=True)
+	page_id = models.CharField(max_length=255, null=True, blank=True)
+	user_id = models.CharField(max_length=255, null=True, blank=True)
+	user_name = models.CharField(max_length=255, null=True, blank=True)
+
+	class Meta:
+		verbose_name = "LIKE"
+		verbose_name_plural = "LIKE"
+
+	def __str__(self):
+		return self.user_name
 	
