@@ -50,3 +50,19 @@ class Likes(models.Model):
 	def __str__(self):
 		return self.user_name
 	
+class Twitter(models.Model):
+
+	tweet_id = models.CharField(max_length=255, null=True, blank=True)
+	user = models.CharField(max_length=255, null=True, blank=True)
+	fullname = models.CharField(max_length=255, null=True, blank=True)
+	timestamp = models.DateField(null=True, blank=True)
+	tweet = models.TextField(max_length=1000000, null=True, blank=True)
+	keyword = models.CharField(max_length=255, null=True, blank=True)
+	
+	class Meta:
+		verbose_name = "Twitter"
+		verbose_name_plural = "Twitter"
+
+	def __str__(self):
+		return self.user
+	

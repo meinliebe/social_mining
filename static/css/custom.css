@@ -16,6 +16,7 @@ div#preloader {
 	z-index: 999 !important; 
 	width: 100% !important; 
 	height: 100% !important; 
-	overflow: visible !important; 
+	overflow: visible !important;
+	z-index: 1000; 
 	background: #333 url('http://files.mimoymima.com/images/loading.gif') no-repeat center center !important; 
 }

@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 
-from facebook_mining.models import Mining, Page_feed, Likes
+from facebook_mining.models import Mining, Page_feed, Likes, Twitter
+from twitterscraper import query_tweets
+import datetime
 import requests
 import dateutil.parser as dateparser
 
@@ -12,7 +14,7 @@ import json
 
 
 # ACCESS_TOKEN = 'EAACEdEose0cBANY2rmJLzvXpZAj3JkC3s18erkmFUFt8ZB4PnDxmA6ZAznEZCHklylkVOZCyMAZCA5FHMBEdt2sXFZCCyFPzvTvkBszvvCe9k6EplGzcDH8eJeMui9djHXbQP5vg0J9r5bRDEvRjZAyeUPTOQw727miJE6uR0Dl3OYP26KCxz05q5HN15ITMQBvnZAazPDrcDdwZDZD'
-ACCESS_TOKEN = 'EAACEdEose0cBAOltD8fo0gqcRH4eJ6hlc3RZBZCt3gQFiQ4sBdA6g9uSgaZAmxV8c03cveTH3ZBfqU77pwXVmpPKyRJDyobKi9QlBG6ZCDIw8Qx8S3OIDG8NlJinD1PTRO6OpIRy4T2mvotaro4zfBZBr1mSHriRnegaTr87ZC3ieABib1Lx70VL8293kPWCK2uQX7tN55PUwZDZD'
+ACCESS_TOKEN = 'EAACEdEose0cBAAqx95VPhcraJ0TegbrKh3RuYClKwPSpyKKQyzl2JXiXE0ykmYZB0TTUdbwboKEFueHGrcXvHmPprJBDRoyVMvLryNm5ws8DWeFCnGLJ1slGDMtDZBCuSejvu7vszafCEzRqGrpzE0XyJ0GeaStAN2y0nSO0m9cgxUVAJ5C4lTZACrb0kVY4mV12RIQfgZDZD'
 
 def landing(request):
 	data = {}
@@ -45,7 +47,6 @@ def get_data(request):
 		raise GraphAPI(response)
 
 	types = 'page'
-	limits = '5'
 	# keywords = 'pemerintah indonesia'
 	
 	kiri = 97.0137845
@@ -104,7 +105,6 @@ def get_data(request):
 	# return HttpResponse(json.dumps(likes))
 
 # Create your views here.
-
 def hasil(request):
 	data = {}
 	data['title'] = 'Results'
@@ -114,3 +114,16 @@ def hasil(request):
 	data['query'] = r
 
 	return render(request, 'hasil.html', data)
+
+
+def twitter(request):
+	data={}
+	data['title'] = 'Twitter Scraper'
+	data['twitter'] = True
+	t = []
+	kwrd = 'NKRI harga mati'
+	# tweets = query_tweets("kecebong%20since%3A2017-01-01%20until%3A2017-01-31", 30)
+	tweets = query_tweets(kwrd+"%20since%3A2017-01-01%20until%3A2017-01-31")
+	for tweet in tweets:
+		Twitter.objects.update_or_create(tweet_id=tweet.id, defaults={'user': tweet.user, 'fullname': tweet.fullname, 'tweet': tweet.text, 'timestamp': tweet.timestamp.strftime('%Y-%m-%d'), 'keyword': kwrd})
+	return HttpResponse('Scrap OK!')
