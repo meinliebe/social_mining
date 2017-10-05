@@ -113,6 +113,8 @@ class Keywords(models.Model):
 
 class User(models.Model):
 	nama = models.CharField(max_length=255, null=True, blank=True)
+	urutan = models.CharField(max_length=255, null=True, blank=True)
+
 	class Meta:
 		verbose_name = "User"
 		verbose_name_plural = "Users"
