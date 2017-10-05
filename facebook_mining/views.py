@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 
-from facebook_mining.models import Mining, Page_feed, Likes, Twitter
+from facebook_mining.models import Mining, Page_feed, Likes, Twitter, Likes, User_twitter, Keywords, User
 from twitterscraper import query_tweets
 import datetime
 import requests
@@ -14,7 +14,7 @@ import json
 
 
 # ACCESS_TOKEN = 'EAACEdEose0cBANY2rmJLzvXpZAj3JkC3s18erkmFUFt8ZB4PnDxmA6ZAznEZCHklylkVOZCyMAZCA5FHMBEdt2sXFZCCyFPzvTvkBszvvCe9k6EplGzcDH8eJeMui9djHXbQP5vg0J9r5bRDEvRjZAyeUPTOQw727miJE6uR0Dl3OYP26KCxz05q5HN15ITMQBvnZAazPDrcDdwZDZD'
-ACCESS_TOKEN = 'EAACEdEose0cBAAqx95VPhcraJ0TegbrKh3RuYClKwPSpyKKQyzl2JXiXE0ykmYZB0TTUdbwboKEFueHGrcXvHmPprJBDRoyVMvLryNm5ws8DWeFCnGLJ1slGDMtDZBCuSejvu7vszafCEzRqGrpzE0XyJ0GeaStAN2y0nSO0m9cgxUVAJ5C4lTZACrb0kVY4mV12RIQfgZDZD'
+ACCESS_TOKEN = 'EAACEdEose0cBAGgm3pkEmApaZCsIKJCHZCFGPZAOZCWpd9jgp7U9uh1mS0Q9bbIpREEemxBzjG6ByrF5ZCZCdcF7ZBTZBRnZCYX7eHeme1rv1kOk8y3F2D9lth1VvX0ZB4inE2zbezKphPfeLJ0P4MhZBqW65oZCSZBg8s4KNiOrdcKBOHPFEZCNCYJnQ3UTVvJNR4JIzqZBqPc96y2IQZDZD'
 
 def landing(request):
 	data = {}
@@ -115,15 +115,41 @@ def hasil(request):
 
 	return render(request, 'hasil.html', data)
 
+def fb_status(request):
+	g = facebook.GraphAPI(access_token=ACCESS_TOKEN)				
+
+	hasil = []
+	user_id = Likes.objects.values_list('user_id', flat=True)[:10]
+	for uid in user_id:
+		s = g.get_connections(uid, connection_name='friends')['data'] 
+		hasil.append(s)
+	return HttpResponse(json.dumps(hasil))
 
 def twitter(request):
 	data={}
 	data['title'] = 'Twitter Scraper'
 	data['twitter'] = True
 	t = []
-	kwrd = 'NKRI harga mati'
+	kwrd = 'penistaan'
 	# tweets = query_tweets("kecebong%20since%3A2017-01-01%20until%3A2017-01-31", 30)
 	tweets = query_tweets(kwrd+"%20since%3A2017-01-01%20until%3A2017-01-31")
 	for tweet in tweets:
 		Twitter.objects.update_or_create(tweet_id=tweet.id, defaults={'user': tweet.user, 'fullname': tweet.fullname, 'tweet': tweet.text, 'timestamp': tweet.timestamp.strftime('%Y-%m-%d'), 'keyword': kwrd})
+	return HttpResponse('Scrap OK!')
+
+def user_twitter_scrap(request):
+	data={}
+	data['title'] = 'Twitter Scraper'
+	data['twitter'] = True
+	t = []
+	# kwrd = ['Khilafah','ulil amri','demokratis','demokrasi','nasionalis','pancasila','bhineka','save KPK','NKRI harga mati']
+	# usernames = ['Ch_chotimah','Deagnostik','Jayen_1807','Miaemilymia','Aa2gatutkw','5wanlake','alrasyidS','Ghazalisil','Moteetee','GunRomli','AzruRizmy','Nicolas_roel','Ayahhanif2','Utinyanaya','Ayoemimin','H_sodikin128','Av1D1m','Priakolorijo','DullahKamari']
+
+	kwrd = Keywords.objects.values('nama','hubungan','pernyataan')
+	usernames = User.objects.values('nama')
+	for key in kwrd:
+		for usr in usernames:
+			tweets = query_tweets(key['nama']+"%20from%3A"+usr['nama']+"%20since%3A2017-02-01%20until%3A2017-03-30")
+			for tweet in tweets:
+				User_twitter.objects.update_or_create(tweet_id=tweet.id, defaults={'user': tweet.user, 'fullname': tweet.fullname, 'tweet': tweet.text, 'timestamp': tweet.timestamp.strftime('%Y-%m-%d'), 'keyword': key['nama'], 'hubungan': key['hubungan'], 'pernyataan': key['pernyataan']})
 	return HttpResponse('Scrap OK!')

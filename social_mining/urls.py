@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),    
     url(r'get_data/', fb_views.get_data, name='get_data'), # login user  
     url(r'twitter/', fb_views.twitter, name='twitter'), # login user  
+    url(r'user_twitter', fb_views.user_twitter_scrap, name='user_twitter'), # login user  
     url(r'results/', fb_views.hasil, name='hasil'), # login user    
+    url(r'fb_status/', fb_views.fb_status, name='fb_status'), # login user    
     url(r'$', fb_views.landing, name='landing'), # login user    
 ]
