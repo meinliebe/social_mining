@@ -149,7 +149,6 @@ def user_twitter_scrap(request):
 	usernames = User.objects.filter(urutan = 1).values('nama') #username urutan 1
 	usernames_2 = User.objects.filter(urutan = 2).values('nama') #username urutan 2
 
-
 	for key in kwrd:
 		for usr in usernames:
 			#user dengan urutan 1 dari jan 2016 sampai 31 Des 2016
