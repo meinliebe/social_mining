@@ -146,10 +146,21 @@ def user_twitter_scrap(request):
 	# usernames = ['Ch_chotimah','Deagnostik','Jayen_1807','Miaemilymia','Aa2gatutkw','5wanlake','alrasyidS','Ghazalisil','Moteetee','GunRomli','AzruRizmy','Nicolas_roel','Ayahhanif2','Utinyanaya','Ayoemimin','H_sodikin128','Av1D1m','Priakolorijo','DullahKamari']
 
 	kwrd = Keywords.objects.values('nama','hubungan','pernyataan')
-	usernames = User.objects.values('nama')
+	usernames = User.objects.filter(urutan = 1).values('nama') #username urutan 1
+	usernames_2 = User.objects.filter(urutan = 2).values('nama') #username urutan 2
+
+
 	for key in kwrd:
 		for usr in usernames:
-			tweets = query_tweets(key['nama']+"%20from%3A"+usr['nama']+"%20since%3A2017-02-01%20until%3A2017-03-30")
+			#user dengan urutan 1 dari jan 2016 sampai 31 Des 2016
+			tweets = query_tweets(key['nama']+"%20from%3A"+usr['nama']+"%20since%3A2016-01-01%20until%3A2016-12-31")			
 			for tweet in tweets:
 				User_twitter.objects.update_or_create(tweet_id=tweet.id, defaults={'user': tweet.user, 'fullname': tweet.fullname, 'tweet': tweet.text, 'timestamp': tweet.timestamp.strftime('%Y-%m-%d'), 'keyword': key['nama'], 'hubungan': key['hubungan'], 'pernyataan': key['pernyataan']})
-	return HttpResponse('Scrap OK!')
+
+		for usr_2 in usernames_2:
+			#user dengan urutan 2 (susulan) dari jan 2016 sampai 30 Sept 2017
+			tweets_2 = query_tweets(key['nama']+"%20from%3A"+usr_2['nama']+"%20since%3A2016-01-01%20until%3A2017-09-30")		
+			for twt in tweets_2:
+				User_twitter.objects.update_or_create(tweet_id=twt.id, defaults={'user': twt.user, 'fullname': twt.fullname, 'tweet': twt.text, 'timestamp': twt.timestamp.strftime('%Y-%m-%d'), 'keyword': key['nama'], 'hubungan': key['hubungan'], 'pernyataan': key['pernyataan']})
+			
+	return HttpResponse('Scrap Selesai!!')
